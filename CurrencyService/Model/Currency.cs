@@ -9,6 +9,7 @@ namespace CurrencyService.Model
     {
         public string Code { get; set; }
         public string Desription { get; set; }
+        public string Table { get; set; }
 
     }
 }

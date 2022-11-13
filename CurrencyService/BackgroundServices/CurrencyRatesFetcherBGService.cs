@@ -44,9 +44,12 @@ namespace CurrencyService.BackgroundServices
 
         private async Task DoWork(CancellationToken stoppingToken)
         {
-            _logger.LogInformation(
-                "Do work");
-            await _CurrencyProcessService.FetchandSaveNewDataFromCurrencyRatesProvider();
+            DateTime CurrentTime = DateTime.Now;
+            if ((CurrentTime.Date > _LastFetchTime.Date) && (CurrentTime.Hour >= _FetchHour))
+            {
+                if (await _CurrencyProcessService.FetchandSaveNewDataFromCurrencyRatesProvider())
+                    _LastFetchTime = CurrentTime;
+            }
 
         }
 

@@ -4,6 +4,6 @@ namespace CurrencyService.Services
 {
     public interface ICurrencyProcessingService
     {
-        Task FetchandSaveNewDataFromCurrencyRatesProvider();
+        Task<bool> FetchandSaveNewDataFromCurrencyRatesProvider();
     }
 }

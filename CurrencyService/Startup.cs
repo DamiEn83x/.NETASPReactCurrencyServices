@@ -6,6 +6,7 @@ using CurrencyService.BackgroundServices;
 using CurrencyService.Data;
 using CurrencyService.Repositories;
 using CurrencyService.Repositories.Inrfaces;
+using CurrencyService.Repositories.NBPAPI;
 using CurrencyService.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +39,11 @@ namespace CurrencyService
             services.AddTransient<ICurrencyProcessingService, CurrencyProcessingService>();
             services.Configure<CurrencyRatesFetcherBGServiceOptions>(Configuration.GetSection("Extensions:"+
                                       CurrencyRatesFetcherBGServiceOptions.Position));
+            services.Configure<APINBPCurrencyRatesRepositoryOptions>(Configuration.GetSection("Extensions:" +
+                           APINBPCurrencyRatesRepositoryOptions.Position));
+            services.Configure<CurrencyProcessingServiceOptions>(Configuration.GetSection("Extensions:" +
+                          CurrencyProcessingServiceOptions.Position));
+
             services.AddHostedService<CurrencyRatesFetcherBGService>();
 
             services.AddDbContext<DataContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -57,6 +63,8 @@ namespace CurrencyService
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+       
         }
     }
 }

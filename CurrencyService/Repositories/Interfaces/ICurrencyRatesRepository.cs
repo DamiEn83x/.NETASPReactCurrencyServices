@@ -7,8 +7,11 @@ namespace CurrencyService.Services
 {
     public interface ICurrencyRatesRepository
     {
-        IEnumerable<decimal> GetCurrencyRates(DateTime DateFrom, DateTime DateTo, string currency);
+        IEnumerable<CurrencyRate> GetCurrencyRates(DateTime DateFrom, DateTime DateTo, Currency currency);
         IEnumerable<Currency> GetReferenceCurrencies();
         IEnumerable<Currency> GetAllCurrencies();
+
+        DateTime GetDateLastPublication();
+        DateTime GetDateLastPublication(Currency currency);
     }
 }

@@ -21,7 +21,14 @@ namespace CurrencyService.Repositories.Inrfaces
         DateTime LastAnyCurrencyRateDate();
 
         DateTime LastCurrencyRateDate(Currency currency);
-        
+
+        DateTime LastSuccessfulllUpdateDate();
+
+        void UpdateCurrencies(IEnumerable<Currency> currencies);
+
+        void AddCurrencyRates(IEnumerable<CurrencyRate> currenciesRates);
+
+
 
     }
 }
