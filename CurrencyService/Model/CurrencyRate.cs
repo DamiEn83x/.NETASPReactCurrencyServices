@@ -7,7 +7,8 @@ namespace CurrencyService.Model
 {
     public class CurrencyRate
     {
-        public Currency Currency;
+        public int CurrencyRateId { get; set; }
+        public Currency Currency { get; set; }
         public decimal RateToBaseCurrency{ get; set; }
         public DateTime DateOfRate { get; set; }
     }

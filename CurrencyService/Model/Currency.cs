@@ -7,6 +7,7 @@ namespace CurrencyService.Model
 {
     public class Currency
     {
+        public int CurrencyId { get; set; }
         public string Code { get; set; }
         public string Desription { get; set; }
         public string Table { get; set; }

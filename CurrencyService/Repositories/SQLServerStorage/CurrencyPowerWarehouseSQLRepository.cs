@@ -1,4 +1,5 @@
-﻿using CurrencyService.Model;
+﻿using CurrencyService.Data;
+using CurrencyService.Model;
 using CurrencyService.Repositories.Inrfaces;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,10 +13,11 @@ namespace CurrencyService.Repositories
     public class CurrencyPowerWarehouseSQLRepository : ICurrencyPowerWarehouseRepository
     {
         private readonly ILogger _logger;
-
-        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger)
+        private readonly DataContext _ctx;
+        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DataContext ctx)
         {
             _logger = logger;
+            _ctx = ctx;
         }
 
         public int AddCurrencyIfNotExists(Currency currency)
@@ -30,10 +32,8 @@ namespace CurrencyService.Repositories
 
         public void AddCurrencyRates(IEnumerable<CurrencyRate> currenciesRates)
         {
-            currenciesRates.ToList().ForEach(rate => {
-                _logger.LogInformation($"Adding new currrency rates for {rate.Currency.Code} rate {rate.RateToBaseCurrency}  date {rate.DateOfRate}  table{rate.Currency.Table} ");
-            });
-
+            _ctx.CurrencyRates.AddRange(currenciesRates);
+            _ctx.SaveChanges();
         }
 
         public bool CurrencyExists(Currency currency)
@@ -66,9 +66,18 @@ namespace CurrencyService.Repositories
             throw new NotImplementedException();
         }
 
-        public DateTime LastSuccessfulllUpdateDate()
+        public void SetFailedFetch(string szError)
         {
-            return DateTime.Parse("2022-11-08", new CultureInfo("pl-PL"));
+            RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Error = szError, Successfull = false };
+            _ctx.RatesDownloads.Add(FetchStatus);
+            _ctx.SaveChanges();
+;        }
+
+        public void SetSuccessfullFetch()
+        {
+            RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Successfull = true };
+            _ctx.RatesDownloads.Add(FetchStatus);
+            _ctx.SaveChanges();
         }
 
         int ICurrencyPowerWarehouseRepository.AddCurrencyIfNotExists(Currency currency)
@@ -101,24 +110,33 @@ namespace CurrencyService.Repositories
             throw new NotImplementedException();
         }
 
-        DateTime ICurrencyPowerWarehouseRepository.LastAnyCurrencyRateDate()
-        {
-            throw new NotImplementedException();
-        }
 
         DateTime ICurrencyPowerWarehouseRepository.LastCurrencyRateDate(Currency currency)
         {
-            return DateTime.Parse("2022-11-06", new CultureInfo("pl-PL"));
+            CurrencyRate lastdownload = _ctx.CurrencyRates.Where(s => s.Currency.Code==currency.Code).OrderByDescending(o => o.DateOfRate).FirstOrDefault();
+            if (lastdownload != null)
+                return lastdownload.DateOfRate;
+            else
+                return DateTime.MinValue;
         }
 
-        DateTime ICurrencyPowerWarehouseRepository.LastSuccessfulllUpdateDate()
+        DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullUpdateDate()
         {
-            return DateTime.Parse("2022-11-06", new CultureInfo("pl-PL"));
+            RatesDownload lastdownload = _ctx.RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.FetchDate).FirstOrDefault();
+            if (lastdownload != null)
+                return lastdownload.FetchDate;
+            else
+                return DateTime.MinValue;
         }
 
         void ICurrencyPowerWarehouseRepository.UpdateCurrencies(IEnumerable<Currency> currencies)
         {
-            Console.WriteLine("Updating Currencies list");
+            var missingRecords = currencies.Where(x => !_ctx.Currencies.Any(z => z.Code == x.Code)).ToList();
+            if (missingRecords.Count > 0)
+            {
+                _ctx.Currencies.AddRange(missingRecords);
+                _ctx.SaveChanges();
+            }
         }
     }
 }

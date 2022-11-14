@@ -18,11 +18,12 @@ namespace CurrencyService.Repositories.Inrfaces
 
         int AddCurrencyRate(Currency currency, DateTime date, decimal rate);
 
-        DateTime LastAnyCurrencyRateDate();
-
         DateTime LastCurrencyRateDate(Currency currency);
 
-        DateTime LastSuccessfulllUpdateDate();
+        DateTime LastSuccessfullUpdateDate();
+
+        void SetSuccessfullFetch();
+        void SetFailedFetch(string Error);
 
         void UpdateCurrencies(IEnumerable<Currency> currencies);
 

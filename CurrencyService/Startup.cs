@@ -32,11 +32,11 @@ namespace CurrencyService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices( IServiceCollection services)
         {
-            services.AddTransient<ICurrencyRatesRepository, APINBPCurrencyRatesRepository>();
-            services.AddTransient<ICurrencyPowerWarehouseRepository, CurrencyPowerWarehouseSQLRepository>();
+            services.AddScoped<ICurrencyRatesRepository, APINBPCurrencyRatesRepository>();
+            services.AddScoped<ICurrencyPowerWarehouseRepository, CurrencyPowerWarehouseSQLRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddTransient<ICurrencyProcessingService, CurrencyProcessingService>();
+            services.AddScoped<ICurrencyProcessingService, CurrencyProcessingService>();
             services.Configure<CurrencyRatesFetcherBGServiceOptions>(Configuration.GetSection("Extensions:"+
                                       CurrencyRatesFetcherBGServiceOptions.Position));
             services.Configure<APINBPCurrencyRatesRepositoryOptions>(Configuration.GetSection("Extensions:" +

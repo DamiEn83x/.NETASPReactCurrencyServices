@@ -27,6 +27,8 @@ namespace CurrencyService.Services
             _CurrencyRatesRepository = CurrencyRatesRepository;
             _CurrencyPowerWarehouseRepository = CurrencyPowerWarehouseRepository;
             _DateStartingFetchingRates = ((CurrencyProcessingServiceOptions)options.Value).DateStartingFetchingRates;
+            if (_DateStartingFetchingRates == DateTime.MinValue)
+                throw new Exception("DateStartingFetchingRates hasnt been set in appsettings");
 
         }
 
@@ -35,34 +37,50 @@ namespace CurrencyService.Services
             Console.WriteLine("Fetching data from Currency repository");
             _logger.LogInformation("Fetching data from Currency repository");
             DateTime CurrencyAPILastPublicatonDate = _CurrencyRatesRepository.GetDateLastPublication();
-            DateTime WarehouseLastSuccesfulllUpdateDate = _CurrencyPowerWarehouseRepository.LastSuccessfulllUpdateDate();
+            DateTime WarehouseLastSuccesfulllUpdateDate = _CurrencyPowerWarehouseRepository.LastSuccessfullUpdateDate();
             if (CurrencyAPILastPublicatonDate > WarehouseLastSuccesfulllUpdateDate)
             {
-                IEnumerable<Currency> Currencies =_CurrencyRatesRepository.GetAllCurrencies();
-                _CurrencyPowerWarehouseRepository.UpdateCurrencies(Currencies);
-                Currencies.ToList().ForEach(currency => {
-                    DateTime CurrencyLastUpdate = _CurrencyPowerWarehouseRepository.LastCurrencyRateDate(currency);
-                    if (CurrencyLastUpdate==DateTime.MinValue)
+                _logger.LogInformation($"Found new currency data from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllUpdateDate}");
+                try
+                {
+                    IEnumerable<Currency> Currencies = _CurrencyRatesRepository.GetAllCurrencies();
+                    _CurrencyPowerWarehouseRepository.UpdateCurrencies(Currencies);
+                    _logger.LogInformation($"Update currencies  in count {Currencies.Count()}");
+
+                    Currencies.ToList().ForEach(currency =>
                     {
-                        CurrencyLastUpdate = _DateStartingFetchingRates.AddDays(-1);
-                    }
-                    DateTime RatesFrom=CurrencyLastUpdate;
-                    DateTime RatesTo= DateTime.MinValue;
-                    do
-                    {
-                        RatesTo = new DateTime(RatesFrom.Year, 12, 31);
-                        if (RatesTo > CurrencyAPILastPublicatonDate)
-                            RatesTo = CurrencyAPILastPublicatonDate;
-                        IList<CurrencyRate> CurrencyRates = _CurrencyRatesRepository.GetCurrencyRates(RatesFrom, RatesTo, currency).ToList();
-                        if (CurrencyRates.Count > 0)
+                        DateTime CurrencyLastUpdate = _CurrencyPowerWarehouseRepository.LastCurrencyRateDate(currency);
+                        if (CurrencyLastUpdate < CurrencyAPILastPublicatonDate)
                         {
-                            _CurrencyPowerWarehouseRepository.AddCurrencyRates(CurrencyRates);
+                            _logger.LogInformation($"Fetching rates for  {currency.Code} . Lates  db  rate is from {CurrencyLastUpdate}");
+                            if (CurrencyLastUpdate == DateTime.MinValue)
+                            {
+                                CurrencyLastUpdate = _DateStartingFetchingRates.AddDays(-1);
+                            }
+                            DateTime RatesFrom = CurrencyLastUpdate;
+                            DateTime RatesTo = DateTime.MinValue;
+                            do
+                            {
+                                RatesTo = new DateTime(RatesFrom.Year, 12, 31);
+                                if (RatesTo > CurrencyAPILastPublicatonDate)
+                                    RatesTo = CurrencyAPILastPublicatonDate;
+                                IList<CurrencyRate> CurrencyRates = _CurrencyRatesRepository.GetCurrencyRates(RatesFrom, RatesTo, currency).ToList();
+                                if (CurrencyRates.Count > 0)
+                                {
+                                    _CurrencyPowerWarehouseRepository.AddCurrencyRates(CurrencyRates);
+                                }
+                                RatesFrom = new DateTime(RatesFrom.Year + 1, 1, 1);
+
+                            } while (RatesFrom < CurrencyAPILastPublicatonDate);
                         }
-                        RatesFrom = new DateTime(RatesFrom.Year + 1, 1, 1);
 
-                    } while (RatesFrom < CurrencyAPILastPublicatonDate);
-
-                });
+                    });
+                    _CurrencyPowerWarehouseRepository.SetSuccessfullFetch();
+                }catch (Exception e)
+                {
+                    _CurrencyPowerWarehouseRepository.SetFailedFetch(e.Message+ " " +e.StackTrace.ToString());
+                    return false;
+                }
 
             }
             return true;

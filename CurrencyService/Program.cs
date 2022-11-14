@@ -26,6 +26,7 @@ namespace CurrencyService
                 logging.AddConsole();
                 logging.AddDebug();
                 logging.AddEventSourceLogger();
+                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
                 // Enable NLog as one of the Logging Provider
                 logging.AddNLog();
             })

@@ -16,5 +16,7 @@ namespace CurrencyService.Data
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
 
+        public DbSet<RatesDownload> RatesDownloads { get; set; }
+
     }
 }

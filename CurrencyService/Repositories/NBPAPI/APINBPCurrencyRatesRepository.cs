@@ -29,26 +29,30 @@ namespace CurrencyService.Repositories.NBPAPI
         {
             DateTime Result=new DateTime();
             IEnumerable<APITableResultObject> CurrenciesTable = null;
-            using (var client = new HttpClient())
+            for (int i = 0; i < 3; i++)
             {
-                client.BaseAddress = new Uri(_APIBaseURL);
-                string Uri = "exchangerates/tables/A/?format=JSON";
-                var responseTask = client.GetAsync(Uri);
-                responseTask.Wait();
-
-                var result = responseTask.Result;
-                if (result.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
-                    readTask.Wait();
+                    client.BaseAddress = new Uri(_APIBaseURL);
+                    string Uri = "exchangerates/tables/A/?format=JSON";
+                    var responseTask = client.GetAsync(Uri);
+                    responseTask.Wait();
 
-                    CurrenciesTable = readTask.Result;
-                    var cultureInfo = new CultureInfo("pl-PL");
-                    Result = DateTime.Parse(CurrenciesTable.First().effectiveDate, cultureInfo);
-                }
-                else //web api sent error response 
-                {
-                    throw new  Exception($"Error durring fewtch data from  API:{client.BaseAddress+Uri}");
+                    var result = responseTask.Result;
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
+                        readTask.Wait();
+
+                        CurrenciesTable = readTask.Result;
+                        var cultureInfo = new CultureInfo("pl-PL");
+                        Result = DateTime.Parse(CurrenciesTable.First().effectiveDate, cultureInfo);
+                        break;
+                    }
+                    else //web api sent error response 
+                    {   if(i>=2)
+                            throw new Exception($"Error durring fewtch data from  API:{client.BaseAddress + Uri}");
+                    }
                 }
             }
             return Result;
@@ -70,30 +74,35 @@ namespace CurrencyService.Repositories.NBPAPI
                     table = "A";
                 else
                     table = "B";
-                using (var client = new HttpClient())
+                for (int j = 0; j < 3; j++)
                 {
-                    client.BaseAddress = new Uri(_APIBaseURL);
-                    string Uri = $"exchangerates/tables/{table}/?format=JSON";
-                    var responseTask = client.GetAsync(Uri);
-                    responseTask.Wait();
-
-                    var result = responseTask.Result;
-                    if (result.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
-                        readTask.Wait();
+                        client.BaseAddress = new Uri(_APIBaseURL);
+                        string Uri = $"exchangerates/tables/{table}/?format=JSON";
+                        var responseTask = client.GetAsync(Uri);
+                        responseTask.Wait();
 
-                        CurrenciesTable = readTask.Result;
-
-                        CurrenciesTable.First().rates.ToList().ForEach(currency =>
+                        var result = responseTask.Result;
+                        if (result.IsSuccessStatusCode)
                         {
-                            ResultCurrencies.Add(new Currency() { Code = currency.code, Desription = currency.currency, Table = table });
-                        });
+                            var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
+                            readTask.Wait();
 
-                    }
-                    else //web api sent error response 
-                    {
-                        throw new Exception($"Error durring fewtch data from  API:{client.BaseAddress + Uri}");
+                            CurrenciesTable = readTask.Result;
+
+                            CurrenciesTable.First().rates.ToList().ForEach(currency =>
+                            {
+                                ResultCurrencies.Add(new Currency() { Code = currency.code, Desription = currency.currency, Table = table });
+                            });
+                            break;
+
+                        }
+                        else //web api sent error response 
+                        {
+                            if(j>=2)
+                                throw new Exception($"Error durring fewtch data from  API:{client.BaseAddress + Uri}");
+                        }
                     }
                 }
             }
@@ -105,30 +114,41 @@ namespace CurrencyService.Repositories.NBPAPI
         {
             List<CurrencyRate> ResultCurrencyRates =  new List<CurrencyRate>();
             APIHeadRateResul CurrencyRates = null;
-            using (var client = new HttpClient())
+            for (int i = 0; i < 3; i++)
             {
-                client.BaseAddress = new Uri(_APIBaseURL);
-        
-                string Uri = $"exchangerates/rates/{currency.Table}/{currency.Code}/{DateFrom.ToString(APIDateFormat)}/{DateTo.ToString(APIDateFormat)}/?format=JSON";
-                var responseTask = client.GetAsync(Uri);
-                responseTask.Wait();
-
-                var result = responseTask.Result;
-                if (result.IsSuccessStatusCode)
+                using (var client = new HttpClient())
                 {
-                    var readTask = result.Content.ReadAsAsync<APIHeadRateResul>();
-                    readTask.Wait();
+                    client.BaseAddress = new Uri(_APIBaseURL);
 
-                    CurrencyRates = readTask.Result;
-                    var cultureInfo = new CultureInfo("pl-PL");
-                    CurrencyRates.rates.ToList().ForEach(rate => {
-                        ResultCurrencyRates.Add(new CurrencyRate() { Currency = currency, RateToBaseCurrency = rate.mid, DateOfRate = DateTime.Parse(rate.effectiveDate, cultureInfo) });
+                    string Uri = $"exchangerates/rates/{currency.Table}/{currency.Code}/{DateFrom.ToString(APIDateFormat)}/{DateTo.ToString(APIDateFormat)}/?format=JSON";
+                    var responseTask = client.GetAsync(Uri);
+                    responseTask.Wait();
 
-                    });
-                }
-                else //web api sent error response 
-                {
-                    throw new Exception($"Error durring fewtch data from  API:{client.BaseAddress + Uri}");
+                    var result = responseTask.Result;
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var readTask = result.Content.ReadAsAsync<APIHeadRateResul>();
+                        readTask.Wait();
+
+                        CurrencyRates = readTask.Result;
+                        var cultureInfo = new CultureInfo("pl-PL");
+                        CurrencyRates.rates.ToList().ForEach(rate =>
+                        {
+                            ResultCurrencyRates.Add(new CurrencyRate() { Currency = currency, RateToBaseCurrency = rate.mid, DateOfRate = DateTime.Parse(rate.effectiveDate, cultureInfo) });
+
+                        });
+                        break;
+                    }
+                    else //web api sent error response 
+                    {
+                        if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+                        {
+                            ResultCurrencyRates = new List<CurrencyRate>();
+                            break;
+                        }
+                        else if (i == 2)
+                            throw new Exception($"Error durring fetch data from  API:{client.BaseAddress + Uri}  StatusCode: {result.StatusCode}   Response: {result.Content}");
+                    }
                 }
             }
             return ResultCurrencyRates;
