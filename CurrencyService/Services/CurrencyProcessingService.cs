@@ -46,7 +46,7 @@ namespace CurrencyService.Services
                     IEnumerable<Currency> Currencies = _CurrencyRatesRepository.GetAllCurrencies();
                     _CurrencyPowerWarehouseRepository.UpdateCurrencies(Currencies);
                     _logger.LogInformation($"Update currencies  in count {Currencies.Count()}");
-
+                    Currencies = _CurrencyPowerWarehouseRepository.GetAllCurrencies();
                     Currencies.ToList().ForEach(currency =>
                     {
                         DateTime CurrencyLastUpdate = _CurrencyPowerWarehouseRepository.LastCurrencyRateDate(currency);
@@ -67,7 +67,8 @@ namespace CurrencyService.Services
                                 IList<CurrencyRate> CurrencyRates = _CurrencyRatesRepository.GetCurrencyRates(RatesFrom, RatesTo, currency).ToList();
                                 if (CurrencyRates.Count > 0)
                                 {
-                                    _CurrencyPowerWarehouseRepository.AddCurrencyRates(CurrencyRates);
+                                    
+                                    _CurrencyPowerWarehouseRepository.AddCurrencyRates(FillDateGaps(CurrencyRates, RatesFrom, RatesTo));
                                 }
                                 RatesFrom = new DateTime(RatesFrom.Year + 1, 1, 1);
 
@@ -85,6 +86,38 @@ namespace CurrencyService.Services
             }
             return true;
 
+        }
+
+        private IList<CurrencyRate> FillDateGaps(IList<CurrencyRate> currencyRates, DateTime ratesFrom, DateTime ratesTo)
+        {
+            DateTime CurrentDate = ratesFrom;
+            IList<CurrencyRate> currencyRatesOrdered = currencyRates.OrderBy(o =>  o.DateOfRate).ToList();
+            CurrencyRate FirstRate = currencyRatesOrdered.First();
+            decimal CurrentRate = currencyRatesOrdered.First().RateToBaseCurrency;
+            decimal LastIndex = currencyRatesOrdered.Count() - 1;
+            int itemIndex = 0;
+            do
+            {
+                if (itemIndex > LastIndex)
+                    currencyRatesOrdered.Add(new CurrencyRate() { DateOfRate = CurrentDate, Currency = FirstRate.Currency, RateToBaseCurrency = CurrentRate });
+                else
+                {
+                    if (currencyRatesOrdered[itemIndex].DateOfRate > CurrentDate)
+                    {
+                        currencyRatesOrdered.Add(new CurrencyRate() { DateOfRate = CurrentDate, Currency = FirstRate.Currency, RateToBaseCurrency = CurrentRate });
+                    }
+                    else
+                    {
+                        itemIndex++;
+                        CurrentRate = currencyRatesOrdered[itemIndex].RateToBaseCurrency;
+                    }
+                }
+                CurrentDate = CurrentDate.AddDays(1);
+             
+            }
+            while (CurrentDate <= ratesTo);
+
+            return currencyRatesOrdered.OrderBy(o => o.DateOfRate).ToList();
         }
     }
 }

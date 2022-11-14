@@ -97,7 +97,7 @@ namespace CurrencyService.Repositories
 
         IEnumerable<Currency> ICurrencyPowerWarehouseRepository.GetAllCurrencies()
         {
-            throw new NotImplementedException();
+            return _ctx.Currencies.ToList();
         }
 
         IEnumerable<CurrencyPowerChange> ICurrencyPowerWarehouseRepository.GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, Currency Currency, IEnumerable<Currency> ChoosenReferenceCurrencies)
