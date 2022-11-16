@@ -10,7 +10,7 @@ namespace CurrencyService.Services
         IEnumerable<CurrencyRate> GetCurrencyRates(DateTime DateFrom, DateTime DateTo, Currency currency);
         IEnumerable<Currency> GetReferenceCurrencies();
         IEnumerable<Currency> GetAllCurrencies();
-
+        Currency GetBaseCurrency();
         DateTime GetDateLastPublication();
         DateTime GetDateLastPublication(Currency currency);
     }

@@ -10,7 +10,8 @@ namespace CurrencyService.Model
         public int CurrencyId { get; set; }
         public string Code { get; set; }
         public string Desription { get; set; }
-        public string Table { get; set; }
+        public bool ReferenceCurrency { get; set; }
+        public bool BaseCurrency { get; set;  }
 
     }
 }

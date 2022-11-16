@@ -20,9 +20,16 @@ namespace CurrencyService.Repositories.NBPAPI
     {
         const string APIDateFormat = "yyyy-MM-dd";
         private string _APIBaseURL ;
+        private Dictionary<string, string> _CodeTableMap = null;
         public APINBPCurrencyRatesRepository(IOptions<APINBPCurrencyRatesRepositoryOptions> options)
         {
+   
             _APIBaseURL = ((APINBPCurrencyRatesRepositoryOptions)options.Value).APIBaseURL;
+        }
+
+        public Currency GetBaseCurrency()
+        {
+            return new Currency() { Code = "PLN", Desription = "polski złoty", BaseCurrency = true,ReferenceCurrency=true };
         }
 
         public DateTime GetDateLastPublication()
@@ -63,8 +70,9 @@ namespace CurrencyService.Repositories.NBPAPI
             throw new NotImplementedException();
         }
 
-        IEnumerable<Currency> ICurrencyRatesRepository.GetAllCurrencies()
+        public IEnumerable<Currency> GetAllCurrencies()
         {
+            Dictionary<string, string>  CodeTableMap=new Dictionary<string, string>();
             List<Currency> ResultCurrencies = new List<Currency>();
             IEnumerable<APITableResultObject> CurrenciesTable = null;
             for (int i = 0; i < 2; i++)
@@ -93,7 +101,8 @@ namespace CurrencyService.Repositories.NBPAPI
 
                             CurrenciesTable.First().rates.ToList().ForEach(currency =>
                             {
-                                ResultCurrencies.Add(new Currency() { Code = currency.code, Desription = currency.currency, Table = table });
+                                CodeTableMap.Add(currency.code, table);
+                                ResultCurrencies.Add(new Currency() { Code = currency.code, Desription = currency.currency, ReferenceCurrency = (table=="A"), BaseCurrency=false });
                             });
                             break;
 
@@ -107,11 +116,17 @@ namespace CurrencyService.Repositories.NBPAPI
                 }
             }
 
+            ResultCurrencies.Add(GetBaseCurrency());
+            this._CodeTableMap = CodeTableMap;
             return ResultCurrencies;
         }
 
         IEnumerable<CurrencyRate> ICurrencyRatesRepository.GetCurrencyRates(DateTime DateFrom, DateTime DateTo, Currency currency)
         {
+            if (_CodeTableMap == null)
+            {
+                this.GetAllCurrencies();
+            }
             List<CurrencyRate> ResultCurrencyRates =  new List<CurrencyRate>();
             APIHeadRateResul CurrencyRates = null;
             for (int i = 0; i < 3; i++)
@@ -120,7 +135,7 @@ namespace CurrencyService.Repositories.NBPAPI
                 {
                     client.BaseAddress = new Uri(_APIBaseURL);
 
-                    string Uri = $"exchangerates/rates/{currency.Table}/{currency.Code}/{DateFrom.ToString(APIDateFormat)}/{DateTo.ToString(APIDateFormat)}/?format=JSON";
+                    string Uri = $"exchangerates/rates/{_CodeTableMap[currency.Code]}/{currency.Code}/{DateFrom.ToString(APIDateFormat)}/{DateTo.ToString(APIDateFormat)}/?format=JSON";
                     var responseTask = client.GetAsync(Uri);
                     responseTask.Wait();
 
