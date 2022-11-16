@@ -168,10 +168,5 @@ namespace CurrencyService.Repositories.NBPAPI
             }
             return ResultCurrencyRates;
         }
-
-        IEnumerable<Currency> ICurrencyRatesRepository.GetReferenceCurrencies()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

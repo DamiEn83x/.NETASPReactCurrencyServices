@@ -131,12 +131,29 @@ namespace CurrencyService.Repositories
 
         void ICurrencyPowerWarehouseRepository.UpdateCurrencies(IEnumerable<Currency> currencies)
         {
-            var missingRecords = currencies.Where(x => !_ctx.Currencies.Any(z => z.Code == x.Code)).ToList();
-            if (missingRecords.Count > 0)
+
+            currencies.ToList().ForEach(currency =>
             {
-                _ctx.Currencies.AddRange(missingRecords);
-                _ctx.SaveChanges();
-            }
+                Currency stored = _ctx.Currencies.SingleOrDefault(b => b.Code == currency.Code);
+            if (stored != null)
+            {
+                if (stored.Desription != currency.Desription ||
+                    stored.BaseCurrency != currency.BaseCurrency ||
+                    stored.ReferenceCurrency != currency.ReferenceCurrency)
+                    {
+                        stored.Desription = currency.Desription;
+                        stored.BaseCurrency = currency.BaseCurrency;
+                        stored.ReferenceCurrency = currency.ReferenceCurrency;
+                        _ctx.SaveChanges();
+                    }
+                }
+                else
+                {
+                    _ctx.Currencies.Add(currency);
+                    _ctx.SaveChanges();
+                }
+
+            });
         }
     }
 }
