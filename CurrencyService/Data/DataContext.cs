@@ -9,6 +9,8 @@ namespace CurrencyService.Data
 {
     public class DataContext : DbContext
     {
+
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 
@@ -17,6 +19,8 @@ namespace CurrencyService.Data
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
 
         public DbSet<RatesDownload> RatesDownloads { get; set; }
+
+        public DbSet<CurrencyPowerChange> CurrencyPawerChanges { get; set; }
 
     }
 }

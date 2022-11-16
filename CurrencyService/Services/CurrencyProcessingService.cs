@@ -84,6 +84,8 @@ namespace CurrencyService.Services
                 }
 
             }
+            else
+                _logger.LogInformation($"Rates in API are from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllUpdateDate} : No need to download reates");
             return true;
 
         }
