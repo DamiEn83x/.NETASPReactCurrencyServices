@@ -1,4 +1,5 @@
-﻿using CurrencyService.Model;
+﻿using CurrencyService.Controllers;
+using CurrencyService.Model;
 using CurrencyService.Repositories.Inrfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -47,7 +48,7 @@ namespace CurrencyService.Services
                     _CurrencyPowerWarehouseRepository.UpdateCurrencies(Currencies);
                     _logger.LogInformation($"Update currencies  in count {Currencies.Count()}");
                     Currencies = _CurrencyPowerWarehouseRepository.GetAllCurrencies();
-                    Currencies.ToList().ForEach(currency =>
+                    Currencies.Where(c=>!c.BaseCurrency).ToList().ForEach(currency =>
                     {
                         DateTime CurrencyLastUpdate = _CurrencyPowerWarehouseRepository.LastCurrencyRateDate(currency);
                         if (CurrencyLastUpdate < CurrencyAPILastPublicatonDate)
@@ -74,6 +75,8 @@ namespace CurrencyService.Services
 
                             } while (RatesFrom < CurrencyAPILastPublicatonDate);
                         }
+                        else
+                            _logger.LogInformation($"FCurrency {currency.Code} is up to date. Last update : {CurrencyLastUpdate}");
 
                     });
                     _CurrencyPowerWarehouseRepository.SetSuccessfullFetch();
@@ -89,6 +92,21 @@ namespace CurrencyService.Services
             return true;
 
         }
+
+
+
+        public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string CurrencyCode, string ChoosenReferenceCurrencies)
+        {
+            return _CurrencyPowerWarehouseRepository.GetCurrencyPowerRange(DateFrom, DateTo, CurrencyCode, ChoosenReferenceCurrencies);
+        }
+
+        public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string CurrencyCode)
+        {
+            string RefCurrenciesStr = string.Join(",", _CurrencyPowerWarehouseRepository.GetReferenceCurrencies().Where(c => c.Code != CurrencyCode).Select(c => c.Code));
+            return _CurrencyPowerWarehouseRepository.GetCurrencyPowerRange(DateFrom, DateTo, CurrencyCode, RefCurrenciesStr);
+        }
+
+
 
         private IList<CurrencyRate> FillDateGaps(IList<CurrencyRate> currencyRates, DateTime ratesFrom, DateTime ratesTo)
         {
@@ -110,8 +128,8 @@ namespace CurrencyService.Services
                     }
                     else
                     {
-                        itemIndex++;
                         CurrentRate = currencyRatesOrdered[itemIndex].RateToBaseCurrency;
+                        itemIndex++;
                     }
                 }
                 CurrentDate = CurrentDate.AddDays(1);
@@ -120,6 +138,16 @@ namespace CurrencyService.Services
             while (CurrentDate <= ratesTo);
 
             return currencyRatesOrdered.OrderBy(o => o.DateOfRate).ToList();
+        }
+
+        IEnumerable<Currency> ICurrencyProcessingService.GetAllCurrencies()
+        {
+            return _CurrencyPowerWarehouseRepository.GetAllCurrencies();
+        }
+
+        IEnumerable<Currency> ICurrencyProcessingService.GetReferenceCurrencies()
+        {
+            return _CurrencyPowerWarehouseRepository.GetReferenceCurrencies();
         }
     }
 }

@@ -9,9 +9,11 @@ namespace CurrencyService.Repositories.Inrfaces
 
     public interface ICurrencyPowerWarehouseRepository
     {
-        IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, Currency Currency, IEnumerable<Currency> ChoosenReferenceCurrencies);
+        IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string  CurrencyCode, string ChoosenReferenceCurrencies);
         IEnumerable<Currency> GetReferenceCurrencies();
         IEnumerable<Currency> GetAllCurrencies();
+
+        Currency GetCurrencyByCode(string code);
 
         bool CurrencyExists(Currency currency);
         int AddCurrencyIfNotExists(Currency currency);

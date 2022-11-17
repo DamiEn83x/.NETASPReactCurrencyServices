@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CurrencyService.Model;
+using CurrencyService.Repositories.Inrfaces;
+using CurrencyService.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyService.Controllers
@@ -11,36 +13,46 @@ namespace CurrencyService.Controllers
     [ApiController]
     public class CurrencyValueController : ControllerBase
     {
+        private ICurrencyProcessingService _CurrencyProcessingService;
+        public CurrencyValueController(ICurrencyProcessingService CurrencyProcessingService)
+        {
+            _CurrencyProcessingService = CurrencyProcessingService;
+        }
 
-
-        [HttpGet("{Token}")]
+        [HttpGet("/GetDataProgress/{Token}")]
         public ActionResult<int> GetDataProgress(int Token)
         {
             return Ok(0);
         }
 
-        [HttpGet]
-        public ActionResult<string> GetHelloWorld(int Token)
+        [HttpGet("/GetHelloWorld/")]
+        public ActionResult<string> GetHelloWorld()
         {
             return Ok("Service is working");
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Currency>> GetCurrenciesTableA(int Token)
+        [HttpGet("/GetRefCurrencies/")]
+        public ActionResult<IEnumerable<Currency>> GetRefCurrencies()
         {
-            return Ok(Enumerable.Empty<Currency>());
+            return Ok(_CurrencyProcessingService.GetReferenceCurrencies().Select(a => CurrencyDTO.FromCurrency(a)).ToList());
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Currency>> GetCurrenciesTableAB(int Token)
+        [HttpGet("/GetAllCurrencies/")]
+        public ActionResult<IEnumerable<CurrencyDTO>> GetAllCurrencies()
         {
-            return Ok(Enumerable.Empty<Currency>());
+            return Ok(_CurrencyProcessingService.GetAllCurrencies().Select(a =>CurrencyDTO.FromCurrency(a)).ToList());
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<CurrencyPowerChange>> GetCurrencyPowerChanges(DateTime DateFrom, DateTime DateTo, string CurrencyCode, IEnumerable<string> ReferenceCurrencies )
+        [HttpGet("/GetCurrencyPowerChanges/{DateFrom}/{DateTo}/{CurrencyCode}/{ReferenceCurrencies}")]
+        public ActionResult<IEnumerable<CurrencyPowerChange>> GetCurrencyPowerChanges(DateTime DateFrom, DateTime DateTo, string CurrencyCode,string ReferenceCurrencies)
         {
-            return Ok(Enumerable.Empty<CurrencyPowerChange>());
+            return Ok(_CurrencyProcessingService.GetCurrencyPowerRange(DateFrom,DateTo,CurrencyCode,ReferenceCurrencies).Select(a => CurrencyPowerChangeDTO.CurrencyPowerChange(a)).ToList());
+        }
+
+        [HttpGet("/GetCurrencyPowerChanges/{DateFrom}/{DateTo}/{CurrencyCode}")]
+        public ActionResult<IEnumerable<CurrencyPowerChange>> GetCurrencyPowerChanges(DateTime DateFrom, DateTime DateTo, string CurrencyCode)
+        {
+            return Ok(_CurrencyProcessingService.GetCurrencyPowerRange(DateFrom, DateTo, CurrencyCode).Select(a => CurrencyPowerChangeDTO.CurrencyPowerChange(a)).ToList());
         }
     }
 }

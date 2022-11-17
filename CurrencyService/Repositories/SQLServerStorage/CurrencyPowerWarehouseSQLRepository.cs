@@ -1,6 +1,7 @@
 ﻿using CurrencyService.Data;
 using CurrencyService.Model;
 using CurrencyService.Repositories.Inrfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -46,10 +47,17 @@ namespace CurrencyService.Repositories
             throw new NotImplementedException();
         }
 
-        public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, Currency Currency, IEnumerable<Currency> ChoosenReferenceCurrencies)
+        public Currency GetCurrencyByCode(string code)
         {
-            throw new NotImplementedException();
+            return _ctx.Currencies.Where(c => c.Code == code).FirstOrDefault();
         }
+
+        public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string CurrencyCode, string ChoosenReferenceCurrencies)
+        {
+            return _ctx.CurrencyPawerChanges.FromSql($"dbo.SelectCurrencyPowers {DateFrom},{DateTo},{CurrencyCode},{ChoosenReferenceCurrencies}")
+                      .ToList();
+        }
+
 
         public IEnumerable<Currency> GetReferenceCurrencies()
         {
@@ -100,14 +108,10 @@ namespace CurrencyService.Repositories
             return _ctx.Currencies.ToList();
         }
 
-        IEnumerable<CurrencyPowerChange> ICurrencyPowerWarehouseRepository.GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, Currency Currency, IEnumerable<Currency> ChoosenReferenceCurrencies)
-        {
-            throw new NotImplementedException();
-        }
 
         IEnumerable<Currency> ICurrencyPowerWarehouseRepository.GetReferenceCurrencies()
         {
-            throw new NotImplementedException();
+            return _ctx.Currencies.Where(c => c.ReferenceCurrency).ToList();
         }
 
 
