@@ -126,7 +126,12 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
             string output = "";
 
             _currencies.OrderBy(i => i.Code).ToList().ForEach(Currency=> { output = output + Currency.Code+',';
-                _rates.Where(i => i.Currency.Code == Currency.Code).OrderBy(i => i.DateOfRate).ToList().ForEach(rate => { output = output + rate.DateOfRate.ToString("yyyy-MM-dd") + "," + rate.RateToBaseCurrency.ToString() + ","; });
+                if (!Currency.BaseCurrency)
+                {
+                    List<CurrencyRate> rates = _rates.Where(i => i.Currency.Code == Currency.Code).OrderBy(i => i.DateOfRate).ToList();
+                    output = output + rates.Count + ',' + rates.First().DateOfRate.ToString("yyyy-MM-dd") + ',' + rates.Last().DateOfRate.ToString("yyyy-MM-dd") + ',';
+                }
+
             });
             return output;
 

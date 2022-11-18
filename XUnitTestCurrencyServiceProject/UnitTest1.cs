@@ -37,7 +37,8 @@ namespace XUnitTestCurrencyServiceProject
         {
             _ICurrencyRatesRepository.ClearAllData();
             _CurrencyPowerWarehouseRepository.ClearAllData();
-            string fetched = "&USD,REF,D2022-10-01,r0.25,D2022-10-10,r0.25,&EUR,REF,D2022-10-01,r0.25,D2022-10-10,r0.25";
+      
+            string fetched = "LP2022-10-11,&USD,REF,D2022-10-01,r0.25,D2022-10-10,r0.25,&EUR,REF,D2022-10-01,r0.25,D2022-10-10,r0.25";
             List<string> fetchedList= fetched.Split(',').ToList();
             Currency currency = null;
             CurrencyRate rate = null;
@@ -51,24 +52,29 @@ namespace XUnitTestCurrencyServiceProject
                 {
                     currency.ReferenceCurrency = true;
                 }
-                if (i.StartsWith("D"))
+                else if (i.StartsWith("D"))
                 {
                     rate = new CurrencyRate() { DateOfRate = DateTime.Parse(i.Substring(1), new CultureInfo("pl-PL")),Currency=currency};
                     _ICurrencyRatesRepository.AddRate(rate);
                 }
-                if (i.StartsWith("r"))
+                else if (i.StartsWith("r"))
                 {
                     rate.RateToBaseCurrency= decimal.Parse(i.Substring(1));
                 }
+                else if (i.StartsWith("LP"))
+                {
+                    _ICurrencyRatesRepository.LastPublication = DateTime.Parse(i.Substring(2), new CultureInfo("pl-PL"));
+                }
+              
 
 
 
             });
            
-            _ICurrencyRatesRepository.LastPublication = DateTime.Parse("2022-11-10", new CultureInfo("pl-PL"));
+         
 
             _ICurrencyProcessingService.FetchandSaveNewDataFromCurrencyRatesProvider();
-            string expected = "EUR,2022-10-01,0.25,2022-10-10,0.25,'PLN,USD,2022-10-01,0.25,2022-10-10,0.25";
+            string expected = "EUR,11,2022-10-01,2022-10-11,PLN,USD,11,2022-10-01,2022-10-11,";
             Assert.Equal(expected, _CurrencyPowerWarehouseRepository.GetDatabaseStateCode());
 
         }

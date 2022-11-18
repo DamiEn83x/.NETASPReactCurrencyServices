@@ -20,12 +20,15 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
         public DateTime LastPublication { get; set; }
         public IEnumerable<Currency> GetAllCurrencies()
         {
-            return FetchedCurrencies;
+            List<Currency> allcurencies = FetchedCurrencies.Where(i => true).ToList();
+            allcurencies.Add(this.GetBaseCurrency());
+            return allcurencies;
         }
 
         public Currency GetBaseCurrency()
         {
-            return FetchedCurrencies.Find(c => c.BaseCurrency);
+            return new Currency() { Code = "PLN", Desription = "polski złoty", BaseCurrency = true, ReferenceCurrency = true };
+
 
         }
 
