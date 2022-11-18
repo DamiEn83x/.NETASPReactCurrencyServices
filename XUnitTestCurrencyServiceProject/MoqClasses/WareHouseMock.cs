@@ -82,7 +82,7 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
 
         public void SetFailedFetch(string Error)
         {
-            throw new NotImplementedException();
+            //do nothing
         }
 
         public void SetSuccessfullFetch()
@@ -129,7 +129,8 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
                 if (!Currency.BaseCurrency)
                 {
                     List<CurrencyRate> rates = _rates.Where(i => i.Currency.Code == Currency.Code).OrderBy(i => i.DateOfRate).ToList();
-                    output = output + rates.Count + ',' + rates.First().DateOfRate.ToString("yyyy-MM-dd") + ',' + rates.Last().DateOfRate.ToString("yyyy-MM-dd") + ',';
+                    if(rates.Count()>0)
+                        output = output + rates.Count + ',' + rates.First().DateOfRate.ToString("yyyy-MM-dd") + ','+rates.First().RateToBaseCurrency.ToString() + ',' + rates.Last().DateOfRate.ToString("yyyy-MM-dd") + ','+rates.Last().RateToBaseCurrency.ToString() + ',';
                 }
 
             });
