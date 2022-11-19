@@ -62,7 +62,7 @@ namespace CurrencyService.Services
                             DateTime RatesTo = DateTime.MinValue;
                             do
                             {
-                                RatesTo = new DateTime(RatesFrom.Year, 12, 31);
+                                RatesTo = RatesFrom.AddDays(_CurrencyRatesRepository.GetMaxRateRangeDays()-1);
                                 if (RatesTo > CurrencyAPILastPublicatonDate)
                                     RatesTo = CurrencyAPILastPublicatonDate;
                                 IList<CurrencyRate> CurrencyRates = _CurrencyRatesRepository.GetCurrencyRates(RatesFrom, RatesTo, currency).ToList();
@@ -71,7 +71,7 @@ namespace CurrencyService.Services
                                     
                                     _CurrencyPowerWarehouseRepository.AddCurrencyRates(FillDateGaps(CurrencyRates, RatesFrom, RatesTo));
                                 }
-                                RatesFrom = new DateTime(RatesFrom.Year + 1, 1, 1);
+                                RatesFrom = RatesFrom.AddDays(_CurrencyRatesRepository.GetMaxRateRangeDays());
 
                             } while (RatesFrom < CurrencyAPILastPublicatonDate);
                         }

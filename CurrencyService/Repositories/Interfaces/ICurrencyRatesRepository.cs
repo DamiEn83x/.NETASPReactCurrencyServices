@@ -12,5 +12,7 @@ namespace CurrencyService.Services
         Currency GetBaseCurrency();
         DateTime GetDateLastPublication();
         DateTime GetDateLastPublication(Currency currency);
+        int GetMaxRateRangeDays();
+       
     }
 }

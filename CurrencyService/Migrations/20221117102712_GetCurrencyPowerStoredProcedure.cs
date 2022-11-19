@@ -33,7 +33,7 @@ namespace CurrencyService.Migrations
 		                    update ref set ref.bucketamount=(1/cr.RateToBaseCurrency)  from  #ReferenceList as ref join Currencies c on c.Code=ref.code join CurrencyRates cr on cr.CurrencyId=c.CurrencyId and cr.DateOfRate=@Datefrom
 		
 
-		                    select CAST (ROW_NUMBER() OVER(ORDER BY cr.DateOfRate ASC) AS INT) AS CurrencyPowerChangeId,cr.DateOfRate as Date,sum(r.bucketamount)/sum(1/cr.RateToBaseCurrency) as PowerIndicator from #ReferenceList  r join  Currencies c on r.Code=c.code join  CurrencyRates cr on  cr.CurrencyId=c.CurrencyId  where cr.DateOfRate>=@Datefrom and cr.DateOfRate<=@DateTo group by cr.DateOfRate order by DateOfRate
+		                    select CAST (ROW_NUMBER() OVER(ORDER BY cr.DateOfRate ASC) AS INT) AS CurrencyPowerChangeId,cr.DateOfRate as Date,sum(1/cr.RateToBaseCurrency)/sum(r.bucketamount) as PowerIndicator from #ReferenceList  r join  Currencies c on r.Code=c.code join  CurrencyRates cr on  cr.CurrencyId=c.CurrencyId  where cr.DateOfRate>=@Datefrom and cr.DateOfRate<=@DateTo group by cr.DateOfRate order by DateOfRate
 	
 		                    drop table #ReferenceList
 

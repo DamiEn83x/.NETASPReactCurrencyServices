@@ -168,5 +168,9 @@ namespace CurrencyService.Repositories.NBPAPI
             }
             return ResultCurrencyRates;
         }
+        public int GetMaxRateRangeDays()
+        {
+            return 365;
+        }
     }
 }
