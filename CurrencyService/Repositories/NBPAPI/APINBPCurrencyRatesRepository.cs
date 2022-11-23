@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CurrencyService.Model;
 using CurrencyService.Services;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace CurrencyService.Repositories.NBPAPI
 {
@@ -48,10 +50,9 @@ namespace CurrencyService.Repositories.NBPAPI
                     var result = responseTask.Result;
                     if (result.IsSuccessStatusCode)
                     {
-                        var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
-                        readTask.Wait();
+                        string jsonContent = result.Content.ReadAsStringAsync().Result;
+                        CurrenciesTable = JsonConvert.DeserializeObject<IList<APITableResultObject>>(jsonContent); 
 
-                        CurrenciesTable = readTask.Result;
                         var cultureInfo = new CultureInfo("pl-PL");
                         Result = DateTime.Parse(CurrenciesTable.First().effectiveDate, cultureInfo);
                         break;
@@ -94,10 +95,9 @@ namespace CurrencyService.Repositories.NBPAPI
                         var result = responseTask.Result;
                         if (result.IsSuccessStatusCode)
                         {
-                            var readTask = result.Content.ReadAsAsync<IList<APITableResultObject>>();
-                            readTask.Wait();
+                            string jsonContent = result.Content.ReadAsStringAsync().Result;
 
-                            CurrenciesTable = readTask.Result;
+                            CurrenciesTable = JsonConvert.DeserializeObject<IList<APITableResultObject>>(jsonContent);
 
                             CurrenciesTable.First().rates.ToList().ForEach(currency =>
                             {
@@ -142,10 +142,11 @@ namespace CurrencyService.Repositories.NBPAPI
                     var result = responseTask.Result;
                     if (result.IsSuccessStatusCode)
                     {
-                        var readTask = result.Content.ReadAsAsync<APIHeadRateResul>();
-                        readTask.Wait();
 
-                        CurrencyRates = readTask.Result;
+
+                        string jsonContent = result.Content.ReadAsStringAsync().Result;
+
+                        CurrencyRates = JsonConvert.DeserializeObject<APIHeadRateResul>(jsonContent);
                         var cultureInfo = new CultureInfo("pl-PL");
                         CurrencyRates.rates.ToList().ForEach(rate =>
                         {

@@ -1,35 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using NLog.Extensions.Logging;
+using CurrencyService.BackgroundServices;
+using CurrencyService.Data;
+using CurrencyService.Repositories;
+using CurrencyService.Repositories.Inrfaces;
+using CurrencyService.Repositories.NBPAPI;
+using CurrencyService.Services;
+using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyService
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
+ builder.Services.AddScoped<ICurrencyRatesRepository, APINBPCurrencyRatesRepository>();
+ builder.Services.AddScoped<ICurrencyPowerWarehouseRepository, CurrencyPowerWarehouseSQLRepository>();
+ builder.Services.AddScoped<ICurrencyProcessingService, CurrencyProcessingService>();
+
+ builder.Services.Configure<CurrencyRatesFetcherBGServiceOptions>(builder.Configuration.GetSection("Extensions:"+
+                                      CurrencyRatesFetcherBGServiceOptions.Position));
+ builder.Services.Configure<APINBPCurrencyRatesRepositoryOptions>(builder.Configuration.GetSection("Extensions:" +
+                           APINBPCurrencyRatesRepositoryOptions.Position));
+builder.Services.Configure<CurrencyProcessingServiceOptions>(builder.Configuration.GetSection("Extensions:" +
+                          CurrencyProcessingServiceOptions.Position));
+
+// services.AddHostedService<CurrencyRatesFetcherBGService>();
+
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Logging.AddSeq();
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-
-            CreateWebHostBuilder(args).Build().Run();
-        }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args).ConfigureLogging((hostingContext, logging) =>
-            {
-                logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                logging.AddConsole();
-                logging.AddDebug();
-                logging.AddEventSourceLogger();
-                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-                // Enable NLog as one of the Logging Provider
-                logging.AddNLog();
-            })
-                .UseStartup<Startup>();
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();

@@ -54,7 +54,7 @@ namespace CurrencyService.Repositories
 
         public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string CurrencyCode, string ChoosenReferenceCurrencies)
         {
-            return _ctx.CurrencyPawerChanges.FromSql($"dbo.SelectCurrencyPowers {DateFrom},{DateTo},{CurrencyCode},{ChoosenReferenceCurrencies}")
+            return _ctx.CurrencyPawerChanges.FromSqlRaw($"dbo.SelectCurrencyPowers {DateFrom},{DateTo},{CurrencyCode},{ChoosenReferenceCurrencies}")
                       .ToList();
         }
 
