@@ -1,11 +1,8 @@
 using CurrencyService.Model;
-using CurrencyService.Repositories.Inrfaces;
 using CurrencyService.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

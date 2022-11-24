@@ -3,7 +3,6 @@ using CurrencyService.Repositories.Inrfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace XUnitTestCurrencyServiceProject.MoqClasses
 {
@@ -12,12 +11,14 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
         List<Currency> _currencies;
         List<CurrencyRate> _rates;
         DateTime _SuccesfullFetch;
+        DateTime _SuccesfullFetchPublication;
 
         public WareHouseMock()
         {
             _currencies = new List<Currency>();
             _rates = new List<CurrencyRate>();
             _SuccesfullFetch = DateTime.MinValue;
+            _SuccesfullFetchPublication  = DateTime.MinValue;
         }
 
         public int AddCurrencyIfNotExists(Currency currency)
@@ -85,9 +86,10 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
             //do nothing
         }
 
-        public void SetSuccessfullFetch()
+        public void SetSuccessfullFetch(DateTime PublicationDate)
         {
             _SuccesfullFetch = DateTime.Now;
+            _SuccesfullFetchPublication = PublicationDate;
         }
 
         public void UpdateCurrencies(IEnumerable<Currency> currencies)
@@ -137,5 +139,11 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
             return output;
 
         }
+
+        public DateTime LastSuccessfullFetchedPublishedDate()
+        {
+            return this._SuccesfullFetchPublication;
+        }
+
     }
 }
