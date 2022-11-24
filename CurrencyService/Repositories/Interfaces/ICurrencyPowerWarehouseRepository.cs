@@ -1,8 +1,4 @@
 ﻿using CurrencyService.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CurrencyService.Repositories.Inrfaces
 {
@@ -22,9 +18,9 @@ namespace CurrencyService.Repositories.Inrfaces
 
         DateTime LastCurrencyRateDate(Currency currency);
 
-        DateTime LastSuccessfullUpdateDate();
+        DateTime LastSuccessfullFetchedPublishedDate();
 
-        void SetSuccessfullFetch();
+        void SetSuccessfullFetch(DateTime PublicationDate);
         void SetFailedFetch(string Error);
 
         void UpdateCurrencies(IEnumerable<Currency> currencies);

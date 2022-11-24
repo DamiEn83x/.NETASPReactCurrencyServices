@@ -27,7 +27,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<CurrencyProcessingServiceOptions>(builder.Configuration.GetSection("Extensions:" +
                           CurrencyProcessingServiceOptions.Position));
 
-// services.AddHostedService<CurrencyRatesFetcherBGService>();
+builder.Services.AddHostedService<CurrencyRatesFetcherBGService>();
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Logging.AddSeq();

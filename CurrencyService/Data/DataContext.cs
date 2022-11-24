@@ -9,7 +9,12 @@ namespace CurrencyService.Data
 {
     public class DataContext : DbContext
     {
-
+        protected override void OnModelCreating(ModelBuilder  modelBuilder)
+        {
+            modelBuilder.Entity<CurrencyRate>()
+                        .Property(p => p.RateToBaseCurrency)
+                        .HasPrecision(20,10); // or whatever your schema specifies
+        }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

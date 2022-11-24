@@ -1,13 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using CurrencyService.Services;
+﻿using CurrencyService.Services;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CurrencyService.BackgroundServices
 {
@@ -36,7 +28,7 @@ namespace CurrencyService.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
-            {
+            {  
                 await DoWork(stoppingToken);
                 await Task.Delay(60000); // 5 minutes
             }
@@ -45,14 +37,21 @@ namespace CurrencyService.BackgroundServices
 
         private async Task DoWork(CancellationToken stoppingToken)
         {
+
             using (var scope = _scopeFactory.CreateScope())
             {
-                ICurrencyProcessingService CurrencyProcessService= scope.ServiceProvider.GetRequiredService<ICurrencyProcessingService>();
-                DateTime CurrentTime = DateTime.Now;
-                if ((CurrentTime.Date > _LastFetchTime.Date) && (CurrentTime.Hour >= _FetchHour))
+                try
                 {
-                    if (await CurrencyProcessService.FetchandSaveNewDataFromCurrencyRatesProvider())
-                        _LastFetchTime = CurrentTime;
+                    ICurrencyProcessingService CurrencyProcessService= scope.ServiceProvider.GetRequiredService<ICurrencyProcessingService>();
+                    DateTime CurrentTime = DateTime.Now;
+                    if ((CurrentTime.Date > _LastFetchTime.Date) && (CurrentTime.Hour >= _FetchHour))
+                    {
+                        if (await CurrencyProcessService.FetchandSaveNewDataFromCurrencyRatesProvider())
+                            _LastFetchTime = CurrentTime;
+                    }
+                }catch(Exception e)
+                {
+                    _logger.LogError(e,"Exception durring background task CurrencyProcessService.FetchandSaveNewDataFromCurrencyRatesProvider");
                 }
             }
 

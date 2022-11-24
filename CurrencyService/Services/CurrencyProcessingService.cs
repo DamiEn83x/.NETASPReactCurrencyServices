@@ -1,12 +1,6 @@
-﻿using CurrencyService.Controllers;
-using CurrencyService.Model;
+﻿using CurrencyService.Model;
 using CurrencyService.Repositories.Inrfaces;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CurrencyService.Services
 {
@@ -29,19 +23,20 @@ namespace CurrencyService.Services
             _CurrencyPowerWarehouseRepository = CurrencyPowerWarehouseRepository;
             _DateStartingFetchingRates = ((CurrencyProcessingServiceOptions)options.Value).DateStartingFetchingRates;
             if (_DateStartingFetchingRates == DateTime.MinValue)
+            {
                 throw new Exception("DateStartingFetchingRates hasnt been set in appsettings");
+            }
 
         }
 
-        public async Task<bool> FetchandSaveNewDataFromCurrencyRatesProvider()
+        public Task<bool> FetchandSaveNewDataFromCurrencyRatesProvider()
         {
-            Console.WriteLine("Fetching data from Currency repository");
             _logger.LogInformation("Fetching data from Currency repository");
             DateTime CurrencyAPILastPublicatonDate = _CurrencyRatesRepository.GetDateLastPublication();
-            DateTime WarehouseLastSuccesfulllUpdateDate = _CurrencyPowerWarehouseRepository.LastSuccessfullUpdateDate();
-            if (CurrencyAPILastPublicatonDate > WarehouseLastSuccesfulllUpdateDate)
+            DateTime WarehouseLastSuccesfulllFetchedPublishedDate = _CurrencyPowerWarehouseRepository.LastSuccessfullFetchedPublishedDate();
+            if (CurrencyAPILastPublicatonDate > WarehouseLastSuccesfulllFetchedPublishedDate)
             {
-                _logger.LogInformation($"Found new currency data from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllUpdateDate}");
+                _logger.LogInformation($"Found new currency data from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllFetchedPublishedDate}");
                 try
                 {
                     IEnumerable<Currency> Currencies = _CurrencyRatesRepository.GetAllCurrencies();
@@ -80,17 +75,17 @@ namespace CurrencyService.Services
                             _logger.LogInformation($"FCurrency {currency.Code} is up to date. Last update : {CurrencyLastUpdate}");
 
                     });
-                    _CurrencyPowerWarehouseRepository.SetSuccessfullFetch();
+                    _CurrencyPowerWarehouseRepository.SetSuccessfullFetch(CurrencyAPILastPublicatonDate);
                 }catch (Exception e)
                 {
                     _CurrencyPowerWarehouseRepository.SetFailedFetch(e.Message+ " " +e.StackTrace.ToString());
-                    return false;
+                    return Task.FromResult(false);
                 }
 
             }
             else
-                _logger.LogInformation($"Rates in API are from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllUpdateDate} : No need to download reates");
-            return true;
+                _logger.LogInformation($"Rates in API are from {CurrencyAPILastPublicatonDate}: Rates  in database are from {WarehouseLastSuccesfulllFetchedPublishedDate} : No need to download reates");
+            return Task.FromResult(true);
 
         }
 

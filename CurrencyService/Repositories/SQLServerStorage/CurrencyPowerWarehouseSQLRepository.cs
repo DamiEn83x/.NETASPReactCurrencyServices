@@ -81,9 +81,9 @@ namespace CurrencyService.Repositories
             _ctx.SaveChanges();
 ;        }
 
-        public void SetSuccessfullFetch()
+        public void SetSuccessfullFetch(DateTime PublicationDate)
         {
-            RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Successfull = true };
+            RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Successfull = true ,PublishedDate=PublicationDate};
             _ctx.RatesDownloads.Add(FetchStatus);
             _ctx.SaveChanges();
         }
@@ -124,11 +124,11 @@ namespace CurrencyService.Repositories
                 return DateTime.MinValue;
         }
 
-        DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullUpdateDate()
+        DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullFetchedPublishedDate()
         {
-            RatesDownload lastdownload = _ctx.RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.FetchDate).FirstOrDefault();
+            RatesDownload lastdownload = _ctx.RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.PublishedDate).FirstOrDefault();
             if (lastdownload != null)
-                return lastdownload.FetchDate;
+                return lastdownload.PublishedDate;
             else
                 return DateTime.MinValue;
         }
