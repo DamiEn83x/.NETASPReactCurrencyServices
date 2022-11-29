@@ -3,14 +3,14 @@ version: '3.4'
 services:
   currencyservice:
     build:
-      context: .
-      dockerfile: CurrencyService/Dockerfile
+      context: ./CurrencyService
+      dockerfile: Dockerfile
   db:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    build:
+      context: ./SQLServerContainer
+      dockerfile: Dockerfile
     expose:
       - "1433"
     ports:
-        - "1435:1433"
-    environment:
-      SA_PASSWORD: "S3cur3P@ssW0rd!"
-      ACCEPT_EULA: "Y"
+        - "1433:1433"
+   

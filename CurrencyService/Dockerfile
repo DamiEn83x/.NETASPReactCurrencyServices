@@ -5,9 +5,9 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["CurrencyService/CurrencyServiceAPI.csproj", "CurrencyService/"]
+COPY ["CurrencyServiceAPI.csproj", "CurrencyService/"]
 RUN dotnet restore "CurrencyService/CurrencyServiceAPI.csproj"
-COPY . .
+COPY . ./CurrencyService
 WORKDIR "/src/CurrencyService"
 RUN dotnet build "CurrencyServiceAPI.csproj" -c Release -o /app
 
