@@ -27,6 +27,7 @@ namespace CurrencyService.Repositories.Inrfaces
 
         void AddCurrencyRates(IEnumerable<CurrencyRate> currenciesRates);
 
+        bool DataBaseIsEmpty();
 
 
     }

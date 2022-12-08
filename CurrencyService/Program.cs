@@ -6,6 +6,7 @@ using CurrencyService.Repositories.NBPAPI;
 using CurrencyService.Services;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -32,6 +33,17 @@ builder.Services.AddHostedService<CurrencyRatesFetcherBGService>();
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Logging.AddSeq();
 var app = builder.Build();
+
+    using(var scope = app.Services.CreateScope())
+    {
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var DBRepo=scope.ServiceProvider.GetRequiredService<ICurrencyPowerWarehouseRepository>();
+        //automatic migration only for new application instance
+        //for application updates use sql sripcs to avoid data lose
+        if(DBRepo.DataBaseIsEmpty())
+            dataContext.Database.Migrate();
+
+    }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -42,6 +42,13 @@ namespace CurrencyService.Repositories
             throw new NotImplementedException();
         }
 
+        public bool DataBaseIsEmpty()
+        {
+            return !(_ctx.Database.SqlQuery<int?>($@"SELECT 1 FROM sys.tables AS T
+                         INNER JOIN sys.schemas AS S ON T.schema_id = S.schema_id
+                         WHERE S.Name = 'SchemaName' AND T.Name = 'Currency'").SingleOrDefault() != null);
+        }
+
         public IEnumerable<Currency> GetAllCurrencies()
         {
             throw new NotImplementedException();
