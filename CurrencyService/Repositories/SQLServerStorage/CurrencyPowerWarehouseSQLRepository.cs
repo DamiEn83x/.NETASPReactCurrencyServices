@@ -44,9 +44,9 @@ namespace CurrencyService.Repositories
 
         public bool DataBaseIsEmpty()
         {
-            return !(_ctx.Database.SqlQuery<int?>($@"SELECT 1 FROM sys.tables AS T
+            return !(_ctx.Database.SqlQuery<int?>($@"SELECT 1 as Value FROM sys.tables AS T
                          INNER JOIN sys.schemas AS S ON T.schema_id = S.schema_id
-                         WHERE S.Name = 'SchemaName' AND T.Name = 'Currency'").SingleOrDefault() != null);
+                         WHERE S.Name = 'dbo' AND T.Name = '__EFMigrationsHistory'").SingleOrDefault() != null);
         }
 
         public IEnumerable<Currency> GetAllCurrencies()
