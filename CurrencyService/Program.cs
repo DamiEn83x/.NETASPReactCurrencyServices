@@ -37,12 +37,20 @@ var app = builder.Build();
     using(var scope = app.Services.CreateScope())
     {
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var DBRepo=scope.ServiceProvider.GetRequiredService<ICurrencyPowerWarehouseRepository>();
-        //automatic migration only for new application instance
-        //for application updates use sql sripcs to avoid data lose
-        if(DBRepo.DataBaseIsEmpty())
-            dataContext.Database.Migrate();
 
+
+
+        bool databaseExists = false;
+        while (!databaseExists)
+        {
+            databaseExists = dataContext.Database.CanConnect();
+            if (!databaseExists)
+            {
+                Console.WriteLine("Waiting for database to come online...");
+                Thread.Sleep(1000); // Sleep for 1 second
+            }
+        }
+        dataContext.Database.EnsureCreated();
     }
 
 // Configure the HTTP request pipeline.

@@ -1,6 +1,17 @@
 # We choose exact tag (not 'latest'), to be sure that new version wont break creating image
 FROM mcr.microsoft.com/mssql/server:2017-CU17-ubuntu
 
+
+RUN mkdir -p /var/opt/mssql
+
+# Set the working directory
+WORKDIR /var/opt/mssql
+
+ENV MSSQL_DATA_DIR /var/opt/mssql
+
+# Create and mount the volume
+VOLUME /var/opt/mssql
+
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
