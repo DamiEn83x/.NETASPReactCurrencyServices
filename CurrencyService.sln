@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestCurrencyServiceProject", "XUnitTestCurrencyServiceProject\XUnitTestCurrencyServiceProject.csproj", "{4C8E9F72-A124-475A-AD3E-D956F84C9AAB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyServiceAPI", "..\..\.NETASPReactCurrencyServices\CurrencyService\CurrencyServiceAPI.csproj", "{D09EFB02-9BA3-4ED8-A133-95733DFB458B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyServiceAPI", ".\CurrencyService\CurrencyServiceAPI.csproj", "{D09EFB02-9BA3-4ED8-A133-95733DFB458B}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{BE29A500-F22E-4504-957D-2125C17176B7}"
 EndProject
