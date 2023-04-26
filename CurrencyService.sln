@@ -5,9 +5,11 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestCurrencyServiceProject", "XUnitTestCurrencyServiceProject\XUnitTestCurrencyServiceProject.csproj", "{4C8E9F72-A124-475A-AD3E-D956F84C9AAB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyServiceAPI", ".\CurrencyService\CurrencyServiceAPI.csproj", "{D09EFB02-9BA3-4ED8-A133-95733DFB458B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyServiceAPI", "CurrencyService\CurrencyServiceAPI.csproj", "{D09EFB02-9BA3-4ED8-A133-95733DFB458B}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{BE29A500-F22E-4504-957D-2125C17176B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrontedReact", "FrontedReact\FrontedReact.csproj", "{DBFEE761-B4E2-4797-81D4-51CCCD6A22EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,14 @@ Global
 		{D09EFB02-9BA3-4ED8-A133-95733DFB458B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D09EFB02-9BA3-4ED8-A133-95733DFB458B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D09EFB02-9BA3-4ED8-A133-95733DFB458B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE29A500-F22E-4504-957D-2125C17176B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE29A500-F22E-4504-957D-2125C17176B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE29A500-F22E-4504-957D-2125C17176B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE29A500-F22E-4504-957D-2125C17176B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBFEE761-B4E2-4797-81D4-51CCCD6A22EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBFEE761-B4E2-4797-81D4-51CCCD6A22EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBFEE761-B4E2-4797-81D4-51CCCD6A22EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBFEE761-B4E2-4797-81D4-51CCCD6A22EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
