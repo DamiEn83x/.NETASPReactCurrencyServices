@@ -30,7 +30,7 @@ builder.Services.Configure<CurrencyProcessingServiceOptions>(builder.Configurati
 
 builder.Services.AddHostedService<CurrencyRatesFetcherBGService>();
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer( builder.Configuration.GetConnectionString("DefaultConnection").Replace("DB_HOST", Environment.GetEnvironmentVariable("DB_HOST"))));
 builder.Logging.AddSeq();
 var app = builder.Build();
 
