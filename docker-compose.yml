@@ -7,6 +7,12 @@ services:
     build:
       context: ./CurrencyService
       dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+    expose:
+      - "80"
+    ports:
+        - "80:80"
   db:
     build:
       context: ./SQLServerContainer
