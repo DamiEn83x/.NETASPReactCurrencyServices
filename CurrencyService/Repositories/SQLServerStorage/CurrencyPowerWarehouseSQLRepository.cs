@@ -14,11 +14,22 @@ namespace CurrencyService.Repositories
     public class CurrencyPowerWarehouseSQLRepository : ICurrencyPowerWarehouseRepository
     {
         private readonly ILogger _logger;
-        private readonly DataContext _ctx;
-        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DataContext ctx)
+        private readonly DbContext _ctx;
+        private readonly DbSet<CurrencyRate> _currencyRates;
+        private readonly DbSet<Currency> _Currencies;
+        private readonly DbSet<CurrencyPowerChange> _CurrencyPawerChanges;
+        private readonly DbSet<RatesDownload>  _RatesDownloads;
+        private readonly DbSet<CurrencyRate> _CurrencyRates;
+
+        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DbContext ctx)
         {
             _logger = logger;
             _ctx = ctx;
+            _currencyRates = _ctx.Set<CurrencyRate>();
+            _CurrencyPawerChanges = _ctx.Set<CurrencyPowerChange>();
+            _Currencies = _ctx.Set<Currency>();
+            _RatesDownloads = _ctx.Set<RatesDownload>();
+            _CurrencyRates =  _ctx.Set<CurrencyRate>();
         }
 
         public int AddCurrencyIfNotExists(Currency currency)
@@ -33,7 +44,7 @@ namespace CurrencyService.Repositories
 
         public void AddCurrencyRates(IEnumerable<CurrencyRate> currenciesRates)
         {
-            _ctx.CurrencyRates.AddRange(currenciesRates);
+            _currencyRates.AddRange(currenciesRates);
             _ctx.SaveChanges();
         }
 
@@ -56,12 +67,12 @@ namespace CurrencyService.Repositories
 
         public Currency GetCurrencyByCode(string code)
         {
-            return _ctx.Currencies.Where(c => c.Code == code).FirstOrDefault();
+            return _Currencies.Where(c => c.Code == code).FirstOrDefault();
         }
 
         public IEnumerable<CurrencyPowerChange> GetCurrencyPowerRange(DateTime DateFrom, DateTime DateTo, string CurrencyCode, string ChoosenReferenceCurrencies)
         {
-            return _ctx.CurrencyPawerChanges.FromSqlRaw($"dbo.SelectCurrencyPowers {DateFrom},{DateTo},{CurrencyCode},{ChoosenReferenceCurrencies}")
+            return _CurrencyPawerChanges.FromSqlRaw($"dbo.SelectCurrencyPowers {DateFrom},{DateTo},{CurrencyCode},{ChoosenReferenceCurrencies}")
                       .ToList();
         }
 
@@ -84,14 +95,14 @@ namespace CurrencyService.Repositories
         public void SetFailedFetch(string szError)
         {
             RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Error = szError, Successfull = false };
-            _ctx.RatesDownloads.Add(FetchStatus);
+            _RatesDownloads.Add(FetchStatus);
             _ctx.SaveChanges();
 ;        }
 
         public void SetSuccessfullFetch(DateTime PublicationDate)
         {
             RatesDownload FetchStatus = new RatesDownload() { FetchDate = DateTime.Now, Successfull = true ,PublishedDate=PublicationDate};
-            _ctx.RatesDownloads.Add(FetchStatus);
+            _RatesDownloads.Add(FetchStatus);
             _ctx.SaveChanges();
         }
 
@@ -112,19 +123,19 @@ namespace CurrencyService.Repositories
 
         IEnumerable<Currency> ICurrencyPowerWarehouseRepository.GetAllCurrencies()
         {
-            return _ctx.Currencies.ToList();
+            return _Currencies.ToList();
         }
 
 
         IEnumerable<Currency> ICurrencyPowerWarehouseRepository.GetReferenceCurrencies()
         {
-            return _ctx.Currencies.Where(c => c.ReferenceCurrency).ToList();
+            return _Currencies.Where(c => c.ReferenceCurrency).ToList();
         }
 
 
         DateTime ICurrencyPowerWarehouseRepository.LastCurrencyRateDate(Currency currency)
         {
-            CurrencyRate lastdownload = _ctx.CurrencyRates.Where(s => s.Currency.Code==currency.Code).OrderByDescending(o => o.DateOfRate).FirstOrDefault();
+            CurrencyRate lastdownload = _CurrencyRates.Where(s => s.Currency.Code==currency.Code).OrderByDescending(o => o.DateOfRate).FirstOrDefault();
             if (lastdownload != null)
                 return lastdownload.DateOfRate;
             else
@@ -133,7 +144,7 @@ namespace CurrencyService.Repositories
 
         DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullFetchedPublishedDate()
         {
-            RatesDownload lastdownload = _ctx.RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.PublishedDate).FirstOrDefault();
+            RatesDownload lastdownload = _RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.PublishedDate).FirstOrDefault();
             if (lastdownload != null)
                 return lastdownload.PublishedDate;
             else
@@ -145,7 +156,7 @@ namespace CurrencyService.Repositories
 
             currencies.ToList().ForEach(currency =>
             {
-                Currency stored = _ctx.Currencies.SingleOrDefault(b => b.Code == currency.Code);
+                Currency stored = _Currencies.SingleOrDefault(b => b.Code == currency.Code);
             if (stored != null)
             {
                 if (stored.Desription != currency.Desription ||
@@ -160,7 +171,7 @@ namespace CurrencyService.Repositories
                 }
                 else
                 {
-                    _ctx.Currencies.Add(currency);
+                    _Currencies.Add(currency);
                     _ctx.SaveChanges();
                 }
 

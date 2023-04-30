@@ -145,5 +145,9 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
             return this._SuccesfullFetchPublication;
         }
 
+        public bool DataBaseIsEmpty()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
