@@ -157,11 +157,11 @@ namespace CurrencyService.Repositories
             currencies.ToList().ForEach(currency =>
             {
                 Currency stored = _Currencies.SingleOrDefault(b => b.Code == currency.Code);
-            if (stored != null)
-            {
-                if (stored.Desription != currency.Desription ||
-                    stored.BaseCurrency != currency.BaseCurrency ||
-                    stored.ReferenceCurrency != currency.ReferenceCurrency)
+                if (stored != null)
+                {
+                    if (stored.Desription != currency.Desription ||
+                        stored.BaseCurrency != currency.BaseCurrency ||
+                        stored.ReferenceCurrency != currency.ReferenceCurrency)
                     {
                         stored.Desription = currency.Desription;
                         stored.BaseCurrency = currency.BaseCurrency;
@@ -175,7 +175,7 @@ namespace CurrencyService.Repositories
                     _ctx.SaveChanges();
                 }
 
-            });
+             });
         }
     }
 }
