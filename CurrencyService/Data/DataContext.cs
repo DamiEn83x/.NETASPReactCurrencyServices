@@ -1,4 +1,5 @@
 ﻿using CurrencyService.Model;
+using CurrencyServiceAPI.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,21 @@ namespace CurrencyService.Data
             modelBuilder.Entity<CurrencyRate>()
                         .Property(p => p.RateToBaseCurrency)
                         .HasPrecision(20,10); // or whatever your schema specifies
+
+
+
+            modelBuilder.Entity<CurrencyRate>(entity =>
+            {
+                entity.Property(e => e.RateToBaseCurrency)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Currency)
+                    .WithMany(p => p.Course)
+                    .HasForeignKey(d => d.TeacherId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Course_Teacher");
+            });
         }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -26,6 +42,10 @@ namespace CurrencyService.Data
         public DbSet<RatesDownload> RatesDownloads { get; set; }
 
         public DbSet<CurrencyPowerChange> CurrencyPawerChanges { get; set; }
+
+        public DbSet<Course> Courses { get; set; }
+
+        public DbSet<Student> Students { get; set; }
 
     }
 }

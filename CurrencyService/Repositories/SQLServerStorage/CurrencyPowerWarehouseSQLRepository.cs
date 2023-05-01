@@ -1,8 +1,10 @@
 ﻿using CurrencyService.Data;
 using CurrencyService.Model;
 using CurrencyService.Repositories.Inrfaces;
+using CurrencyServiceAPI.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Mono.TextTemplating;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,9 +20,40 @@ namespace CurrencyService.Repositories
         private readonly DbSet<CurrencyRate> _currencyRates;
         private readonly DbSet<Currency> _Currencies;
         private readonly DbSet<CurrencyPowerChange> _CurrencyPawerChanges;
-        private readonly DbSet<RatesDownload>  _RatesDownloads;
+        private readonly DbSet<RatesDownload> _RatesDownloads;
         private readonly DbSet<CurrencyRate> _CurrencyRates;
 
+
+        public void DoSomeTuttorialTests()
+        {
+            Student StudentAdam = new Student() { Name = "Adam" };
+            Student StudentRafal= new Student() { Name = "Rafal" };
+            Student StudentAla = new Student() { Name = "Ala" };
+            Course ColurseCS = new Course() { Name = "C#" };
+            Course ColurseJava = new Course() { Name = "JAVA" };
+            Course ColurseSQL = new Course() { Name = "SQL" };
+
+
+            StudentAdam.Courses.Add(ColurseCS);
+            StudentAdam.Courses.Add(ColurseJava);
+
+            StudentRafal.Courses.Add(ColurseCS);
+            StudentRafal.Courses.Add(ColurseSQL);
+
+            StudentAla.Courses.Add(ColurseJava);
+            StudentAla.Courses.Add(ColurseSQL);
+
+
+            ColurseCS.Students.Add(StudentAdam);
+            ColurseCS.Students.Add(StudentRafal);
+
+            ColurseJava.Students.Add(StudentAla);
+            ColurseJava.Students.Add(StudentAdam);
+
+            ColurseSQL.Students.Add(StudentRafal);
+            ColurseSQL.Students.Add(StudentAla);
+
+        }
         public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DbContext ctx)
         {
             _logger = logger;
@@ -30,6 +63,8 @@ namespace CurrencyService.Repositories
             _Currencies = _ctx.Set<Currency>();
             _RatesDownloads = _ctx.Set<RatesDownload>();
             _CurrencyRates =  _ctx.Set<CurrencyRate>();
+
+            DoSomeTuttorialTests();
         }
 
         public int AddCurrencyIfNotExists(Currency currency)
@@ -145,6 +180,7 @@ namespace CurrencyService.Repositories
         DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullFetchedPublishedDate()
         {
             RatesDownload lastdownload = _RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.PublishedDate).FirstOrDefault();
+            _RatesDownloads.Entry(lastdownload).State=EntityState.up
             if (lastdownload != null)
                 return lastdownload.PublishedDate;
             else
