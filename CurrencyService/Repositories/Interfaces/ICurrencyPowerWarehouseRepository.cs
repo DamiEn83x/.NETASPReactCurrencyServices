@@ -29,6 +29,8 @@ namespace CurrencyService.Repositories.Inrfaces
 
         bool DataBaseIsEmpty();
 
+        void DoSomeTuttorialTests();
+
 
     }
 }

@@ -23,12 +23,6 @@ namespace CurrencyService.Data
                 entity.Property(e => e.RateToBaseCurrency)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.Currency)
-                    .WithMany(p => p.Course)
-                    .HasForeignKey(d => d.TeacherId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Course_Teacher");
             });
         }
 

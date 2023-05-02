@@ -1,4 +1,5 @@
-﻿using CurrencyService.Services;
+﻿using CurrencyService.Repositories.Inrfaces;
+using CurrencyService.Services;
 using Microsoft.Extensions.Options;
 
 namespace CurrencyService.BackgroundServices
@@ -42,6 +43,8 @@ namespace CurrencyService.BackgroundServices
             {
                 try
                 {
+                    scope.ServiceProvider.GetRequiredService<ICurrencyPowerWarehouseRepository>().DoSomeTuttorialTests();
+
                     ICurrencyProcessingService CurrencyProcessService= scope.ServiceProvider.GetRequiredService<ICurrencyProcessingService>();
                     DateTime CurrentTime = DateTime.Now;
                     if ((CurrentTime.Date > _LastFetchTime.Date) && (CurrentTime.Hour >= _FetchHour))

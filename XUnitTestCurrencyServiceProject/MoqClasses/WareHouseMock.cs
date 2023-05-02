@@ -149,5 +149,10 @@ namespace XUnitTestCurrencyServiceProject.MoqClasses
         {
             throw new NotImplementedException();
         }
+
+        public void DoSomeTuttorialTests()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

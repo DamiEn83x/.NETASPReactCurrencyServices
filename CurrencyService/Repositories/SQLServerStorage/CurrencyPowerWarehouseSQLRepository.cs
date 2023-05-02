@@ -64,7 +64,7 @@ namespace CurrencyService.Repositories
             _RatesDownloads = _ctx.Set<RatesDownload>();
             _CurrencyRates =  _ctx.Set<CurrencyRate>();
 
-            DoSomeTuttorialTests();
+
         }
 
         public int AddCurrencyIfNotExists(Currency currency)
@@ -180,7 +180,6 @@ namespace CurrencyService.Repositories
         DateTime ICurrencyPowerWarehouseRepository.LastSuccessfullFetchedPublishedDate()
         {
             RatesDownload lastdownload = _RatesDownloads.Where(s => s.Successfull).OrderByDescending(o => o.PublishedDate).FirstOrDefault();
-            _RatesDownloads.Entry(lastdownload).State=EntityState.up
             if (lastdownload != null)
                 return lastdownload.PublishedDate;
             else
