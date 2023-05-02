@@ -28,7 +28,12 @@ namespace CurrencyService.Data
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+            
+        }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseLazyLoadingProxies();
         }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }

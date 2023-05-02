@@ -26,22 +26,22 @@ namespace CurrencyService.Repositories
 
         public void DoSomeTuttorialTests()
         {
-            Student StudentAdam = new Student() { Name = "Adam" };
+           /* Student StudentAdam = new Student() { Name = "Adam" };
             Student StudentRafal= new Student() { Name = "Rafal" };
             Student StudentAla = new Student() { Name = "Ala" };
             Course ColurseCS = new Course() { Name = "C#" };
             Course ColurseJava = new Course() { Name = "JAVA" };
-            Course ColurseSQL = new Course() { Name = "SQL" };
+            Course ColurseSQL = new Course() { Name = "SQL" };*/
 
 
-            StudentAdam.Courses.Add(ColurseCS);
+          /*  StudentAdam.Courses.Add(ColurseCS);
             StudentAdam.Courses.Add(ColurseJava);
 
             StudentRafal.Courses.Add(ColurseCS);
             StudentRafal.Courses.Add(ColurseSQL);
 
             StudentAla.Courses.Add(ColurseJava);
-            StudentAla.Courses.Add(ColurseSQL);
+            StudentAla.Courses.Add(ColurseSQL);*/
 
 
            /* ColurseCS.Students.Add(StudentAdam);
@@ -56,22 +56,25 @@ namespace CurrencyService.Repositories
 
             DbSet<Student>  _Students = _ctx.Set<Student>();
             DbSet<Course> courses = _ctx.Set<Course>();
-            _Students.Add(StudentAdam);
-            _Students.Add(StudentRafal);
-            _Students.Add(StudentAla);
-            courses.Add(ColurseJava);
-            courses.Add(ColurseSQL);
-            courses.Add(ColurseCS);
+            /*  _Students.Add(StudentAdam);
+              _Students.Add(StudentRafal);
+              _Students.Add(StudentAla);
+              courses.Add(ColurseJava);
+              courses.Add(ColurseSQL);
+              courses.Add(ColurseCS);*/
 
 
-           /* Student student = _Students.FirstOrDefault(s => s.Name == "Adam");
-            student.Courses.Add(ColurseJava);
-            student = _Students.FirstOrDefault(s => s.Name == "Ala");
-            student.Courses.Add(ColurseSQL);*/
+            /* Student student = _Students.FirstOrDefault(s => s.Name == "Adam");
+             student.Courses.Add(ColurseJava);
+             student = _Students.FirstOrDefault(s => s.Name == "Ala");
+             student.Courses.Add(ColurseSQL);*/
 
+            // _ctx.SaveChanges();
+
+            Student student = _Students.FirstOrDefault(s => s.StudentId == 7);
+            ICollection<Course> kursy = student.Courses;
+            student.Name = "Piotrek";
             _ctx.SaveChanges();
-
-
 
         }
         public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DataContext ctx)
