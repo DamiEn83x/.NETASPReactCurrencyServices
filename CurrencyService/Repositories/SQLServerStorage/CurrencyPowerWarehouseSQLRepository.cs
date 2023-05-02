@@ -44,14 +44,34 @@ namespace CurrencyService.Repositories
             StudentAla.Courses.Add(ColurseSQL);
 
 
-            ColurseCS.Students.Add(StudentAdam);
+           /* ColurseCS.Students.Add(StudentAdam);
             ColurseCS.Students.Add(StudentRafal);
 
             ColurseJava.Students.Add(StudentAla);
             ColurseJava.Students.Add(StudentAdam);
 
             ColurseSQL.Students.Add(StudentRafal);
-            ColurseSQL.Students.Add(StudentAla);
+            ColurseSQL.Students.Add(StudentAla);*/
+
+
+            DbSet<Student>  _Students = _ctx.Set<Student>();
+            DbSet<Course> courses = _ctx.Set<Course>();
+            _Students.Add(StudentAdam);
+            _Students.Add(StudentRafal);
+            _Students.Add(StudentAla);
+            courses.Add(ColurseJava);
+            courses.Add(ColurseSQL);
+            courses.Add(ColurseCS);
+
+
+           /* Student student = _Students.FirstOrDefault(s => s.Name == "Adam");
+            student.Courses.Add(ColurseJava);
+            student = _Students.FirstOrDefault(s => s.Name == "Ala");
+            student.Courses.Add(ColurseSQL);*/
+
+            _ctx.SaveChanges();
+
+
 
         }
         public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DataContext ctx)

@@ -22,6 +22,21 @@ namespace CurrencyService.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.Property<int>("CoursesCourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentsStudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CoursesCourseId", "StudentsStudentId");
+
+                    b.HasIndex("StudentsStudentId");
+
+                    b.ToTable("CourseStudent");
+                });
+
             modelBuilder.Entity("CurrencyService.Model.Currency", b =>
                 {
                     b.Property<int>("CurrencyId")
@@ -64,7 +79,10 @@ namespace CurrencyService.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("RateToBaseCurrency")
-                        .HasColumnType("decimal(18,2)");
+                        .HasMaxLength(50)
+                        .HasPrecision(20, 10)
+                        .IsUnicode(false)
+                        .HasColumnType("decimal(20,10)");
 
                     b.HasKey("CurrencyRateId");
 
@@ -96,6 +114,55 @@ namespace CurrencyService.Migrations
                     b.HasKey("RatesDownloadId");
 
                     b.ToTable("RatesDownloads");
+                });
+
+            modelBuilder.Entity("CurrencyServiceAPI.Model.Course", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseId");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("CurrencyServiceAPI.Model.Student", b =>
+                {
+                    b.Property<int>("StudentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StudentId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("StudentId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.HasOne("CurrencyServiceAPI.Model.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CoursesCourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CurrencyServiceAPI.Model.Student", null)
+                        .WithMany()
+                        .HasForeignKey("StudentsStudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CurrencyService.Model.CurrencyRate", b =>
