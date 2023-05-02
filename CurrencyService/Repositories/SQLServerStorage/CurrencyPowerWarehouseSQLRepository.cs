@@ -21,7 +21,7 @@ namespace CurrencyService.Repositories
         private readonly DbSet<RatesDownload>  _RatesDownloads;
         private readonly DbSet<CurrencyRate> _CurrencyRates;
 
-        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DbContext ctx)
+        public CurrencyPowerWarehouseSQLRepository(ILogger<CurrencyPowerWarehouseSQLRepository> logger, DataContext ctx)
         {
             _logger = logger;
             _ctx = ctx;
